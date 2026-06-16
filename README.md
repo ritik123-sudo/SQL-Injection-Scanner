@@ -1,4 +1,21 @@
-# SQL-Injection-Scanner
-Automated Scan for Sql Injection Vulnerability
+# Web Application Vulnerability Scanner
 
-"Tested on intentionally vulnerable environments (testphp.vulnweb.com). For educational purposes only."
+## Overview
+
+A Flask-based security assessment tool that automatically discovers web forms, injects SQL injection payloads, analyzes server responses, and generates downloadable HTML reports.
+
+## Features
+
+- Automated form discovery
+- SQL injection payload testing
+- Severity classification
+- HTML report generation
+- Interactive web dashboard
+
+## Tech Stack
+
+- Python
+- Flask
+- Requests
+- BeautifulSoup
+- HTML/CSS/JavaScript
